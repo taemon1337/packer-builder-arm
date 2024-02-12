@@ -21,3 +21,8 @@
 .packer_plugins
 packer_cache
 packer-builder-arm
+
+# root fs
+root/usr/local/go
+root/usr/local/bin
+images/*.img

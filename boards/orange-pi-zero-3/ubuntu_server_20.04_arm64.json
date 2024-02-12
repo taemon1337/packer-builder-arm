@@ -1,0 +1,63 @@
+{
+  "variables": {},
+  "builders": [{
+    "type": "arm",
+    "file_urls" : ["file:///build/images/Orangepizero3_1.0.2_ubuntu_jammy_server_linux6.1.31.img"],
+    "file_checksum_url": "file:///build/images/Orangepizero3_1.0.2_ubuntu_jammy_server_linux6.1.31.img.sha",
+    "file_checksum_type": "file",
+    "file_target_extension": "img",
+    "file_unarchive_cmd": ["xz", "--decompress", "$ARCHIVE_PATH"],
+    "image_build_method": "reuse",
+    "image_path": "orangepi.img",
+    "image_size": "2.8G",
+    "image_type": "dos",
+    "image_partitions": [
+      {
+        "name": "root",
+        "type": "83",
+        "start_sector": "2048",
+        "filesystem": "ext4",
+        "size": "2.8G",
+        "mountpoint": "/"
+      }
+    ],
+    "image_chroot_env": ["PATH=/usr/local/bin:/usr/local/sbin:/usr/bin:/usr/sbin:/bin:/sbin"],
+    "qemu_binary_source_path": "/usr/bin/qemu-aarch64-static",
+    "qemu_binary_destination_path": "/usr/bin/qemu-aarch64-static"
+  }],
+  "provisioners": [
+    {
+       "type": "shell",
+       "inline": [
+         "touch /boot/ssh",
+         "rm -f /etc/resolv.conf",
+         "echo 'nameserver 8.8.8.8' > /etc/resolv.conf",
+         "echo \"127.0.1.1 $HOSTNAME ubuntu\" >> /etc/hosts"
+     ]
+    },
+    {
+      "type": "shell",
+      "inline": [
+        "sudo useradd -s /bin/bash -d /home/ubuntu -m ubuntu",
+        "sudo passwd --expire ubuntu",
+        "sudo userdel orangepi",
+        "sudo rm -rf /home/orangepi"
+      ]
+    },
+    {
+      "type": "file",
+      "source": "./root/ssh/",
+      "destination": "/home/ubuntu/.ssh/"
+    },
+    {
+      "type": "file",
+      "source": "./root/usr/local/bin/",
+      "destination": "/usr/local/bin/"
+    },
+    {
+      "type": "file",
+      "source": "./root/usr/local/go",
+      "destination": "/usr/local/go"
+    }
+  ]
+}
